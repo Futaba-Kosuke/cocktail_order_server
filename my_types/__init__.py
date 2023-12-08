@@ -1,2 +1,2 @@
 # flake8: noqa
-from .main import *
+from .response_models import *

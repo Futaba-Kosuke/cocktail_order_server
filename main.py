@@ -1,14 +1,37 @@
+from typing import List
+
 import uvicorn
 from fastapi import FastAPI
 
-from my_types import HelloWorldModel
+from my_types import MenuModel
 
 app = FastAPI()
 
 
-@app.get("/", response_model=HelloWorldModel)
-def root():
-    return {"Hello": "World"}
+@app.get("/menu", response_model=List[MenuModel])
+def get_menu_list():
+    return [
+        {
+            "id": 1,
+            "name": "マンハッタン",
+            # flake8: noqa
+            "description": "マンハッタン（英: Manhattan）は、ウイスキーベースのカクテルの一種である。カクテルの女王と呼ばれる",
+            "image_url": "https://liqul.com/upimg/2020/06/015-manhattan01.jpg",
+            "method": "stir",
+            "style": "short",
+            "specials": [],
+            "alc_percent": 34.0,
+            "ingredients": [
+                {"id": 1, "name": "ウィスキー", "unit": "ml", "amount_ml": 45},
+                {"id": 2, "name": "スイートベルモット", "unit": "ml", "amount_ml": 15},
+                {
+                    "id": 3,
+                    "name": "アロマティックビダーズ",
+                    "unit": "dash",
+                },
+            ],
+        }
+    ]
 
 
 def main() -> None:
@@ -18,4 +41,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
