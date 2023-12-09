@@ -29,5 +29,5 @@ class LiquidStockModel(BaseModel):
     amount_ml: int
 
 
-class SuccessModel(BaseModel):
-    resp: Literal["success"]
+class OrderSuccessModel(BaseModel):
+    order_id: str
