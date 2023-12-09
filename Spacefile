@@ -6,3 +6,7 @@ micros:
     engine: python3.9
     primary: true
     public: true
+    presets:
+      env:
+        - name: SUPABASE_URL
+        - name: SUPABASE_API_KEY

@@ -1,8 +1,10 @@
 from typing import List
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 
+from database_client import SupabaseClient
 from my_types import (
     DefaultSuccessModel,
     IngredientStockModel,
@@ -13,25 +15,20 @@ from my_types import (
     SelfMenuModel,
 )
 
+# load enviroments
+load_dotenv()
+
+# create fastapi instance
 app = FastAPI()
+
+# create supabase client instance
+database_client = SupabaseClient()
 
 
 @app.get("/self_menu", response_model=List[SelfMenuModel])
 def get_self_menu_list():
-    return [
-        {
-            "id": 1,
-            "name": "アサヒスーパードライ",
-            "image_url": "https://hoge/asahi_super_dry.png",
-            "alc_percent": 5.0,
-        },
-        {
-            "id": 2,
-            "name": "ほろよい もも",
-            "image_url": "https://hoge/moomdayo.jpg",
-            "alc_percent": 3.0,
-        },
-    ]
+    self_menu: List[SelfMenuModel] = database_client.get_self_menu_list()
+    return self_menu
 
 
 @app.get("/order_menu", response_model=List[OrderMenuModel])
