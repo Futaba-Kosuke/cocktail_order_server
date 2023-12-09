@@ -7,6 +7,7 @@ from my_types import (
     LiquidStockModel,
     ManualOrderRequestModel,
     MenuModel,
+    OrderLogCallingModel,
     OrderSuccessModel,
 )
 
@@ -115,6 +116,27 @@ def order(menu_id: int):
 @app.post("/order/manual", response_model=OrderSuccessModel)
 def manual_order(manual_order: ManualOrderRequestModel):
     return {"order_id": 1}
+
+
+@app.get("/order_log/display", response_model=List[OrderLogCallingModel])
+def get_display_order_log():
+    return [
+        {
+            "order_id": 1,
+            "menu_name": "マンハッタン",
+            "status": "processing",
+        },
+        {
+            "order_id": 2,
+            "menu_name": "ほげカクテル",
+            "status": "processing",
+        },
+        {
+            "order_id": 3,
+            "menu_name": "ふがカクテル",
+            "status": "calling",
+        },
+    ]
 
 
 def main() -> None:

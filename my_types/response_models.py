@@ -31,3 +31,9 @@ class LiquidStockModel(BaseModel):
 
 class OrderSuccessModel(BaseModel):
     order_id: str
+
+
+class OrderLogCallingModel(BaseModel):
+    order_id: str
+    menu_name: str
+    status: Literal["processing", "calling"]
