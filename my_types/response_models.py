@@ -27,3 +27,7 @@ class LiquidStockModel(BaseModel):
     name: str
     alc_percent: float
     amount_ml: int
+
+
+class SuccessModel(BaseModel):
+    resp: Literal["success"]

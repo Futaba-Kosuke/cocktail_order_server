@@ -3,7 +3,7 @@ from typing import List
 import uvicorn
 from fastapi import FastAPI
 
-from my_types import LiquidStockModel, MenuModel
+from my_types import LiquidStockModel, MenuModel, SuccessModel
 
 app = FastAPI()
 
@@ -45,7 +45,7 @@ def get_menu_list():
 
 
 @app.get("/menu/{menu_id}", response_model=MenuModel)
-def get_menu_by_id(menu_id):
+def get_menu_by_id(menu_id: int):
     return {
         "id": 1,
         "name": "マンハッタン",
@@ -100,6 +100,11 @@ def get_liquid_stock():
             "amount_ml": 100,
         },
     ]
+
+
+@app.post("/order/{menu_id}", response_model=SuccessModel)
+def order(menu_id: int):
+    return {"resp": "success"}
 
 
 def main() -> None:
