@@ -37,3 +37,7 @@ class OrderLogCallingModel(BaseModel):
     order_id: str
     menu_name: str
     status: Literal["processing", "calling"]
+
+
+class DefaultSuccessModel(BaseModel):
+    resp: Literal["success"]

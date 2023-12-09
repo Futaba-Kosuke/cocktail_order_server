@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from my_types import (
+    DefaultSuccessModel,
     LiquidStockModel,
     ManualOrderRequestModel,
     MenuModel,
@@ -137,6 +138,13 @@ def get_display_order_log():
             "status": "calling",
         },
     ]
+
+
+@app.put(
+    "/order_log/complete/{order_log_id}", response_model=DefaultSuccessModel
+)
+def complete_order(order_log_id: int):
+    return {"resp": "success"}
 
 
 def main() -> None:
