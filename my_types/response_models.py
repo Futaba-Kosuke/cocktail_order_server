@@ -2,31 +2,41 @@ from typing import List, Literal
 
 from pydantic import BaseModel
 
+from .commons import MethodType, OrderStatusType, StyleType, UnitType
+
+
+class SelfMenuModel(BaseModel):
+    id: int
+    name: str
+    image_url: str
+    alc_percent: float
+
 
 class IngredientModel(BaseModel):
     id: int
     name: str
-    unit: Literal["ml", "tea_spoon", "dash"]
+    unit: UnitType
     amount: int
 
 
-class MenuModel(BaseModel):
+class OrderMenuModel(BaseModel):
     id: int
     name: str
     description: str
     image_url: str
-    method: Literal["stir", "shake", "build"]
-    style: Literal["short", "long"]
+    method: MethodType
+    style: StyleType
     specials: List[str] = ["HOT", "SNOW_STYLE"]
     alc_percent: float
     ingredients: List[IngredientModel]
 
 
-class LiquidStockModel(BaseModel):
+class IngredientStockModel(BaseModel):
     id: int
     name: str
     alc_percent: float
-    amount_ml: int
+    unit: UnitType
+    amount: int
 
 
 class OrderSuccessModel(BaseModel):
@@ -36,7 +46,7 @@ class OrderSuccessModel(BaseModel):
 class OrderLogCallingModel(BaseModel):
     order_id: str
     menu_name: str
-    status: Literal["processing", "calling"]
+    status: OrderStatusType
 
 
 class DefaultSuccessModel(BaseModel):

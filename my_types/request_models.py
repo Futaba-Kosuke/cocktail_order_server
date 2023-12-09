@@ -1,11 +1,13 @@
-from typing import List, Literal
+from typing import List
 
 from pydantic import BaseModel
 
+from .commons import UnitType
+
 
 class IngredientRequestModel(BaseModel):
-    liquid_id: int
-    unit: Literal["ml", "tea_spoon", "dash"]
+    ingredient_id: int
+    unit: UnitType
     amount: int
 
 
