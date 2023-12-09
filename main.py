@@ -5,18 +5,37 @@ from fastapi import FastAPI
 
 from my_types import (
     DefaultSuccessModel,
-    LiquidStockModel,
+    IngredientStockModel,
     ManualOrderRequestModel,
-    MenuModel,
     OrderLogCallingModel,
+    OrderMenuModel,
     OrderSuccessModel,
+    SelfMenuModel,
 )
 
 app = FastAPI()
 
 
-@app.get("/menu", response_model=List[MenuModel])
-def get_menu_list():
+@app.get("/self_menu", response_model=List[SelfMenuModel])
+def get_self_menu_list():
+    return [
+        {
+            "id": 1,
+            "name": "アサヒスーパードライ",
+            "image_url": "https://hoge/asahi_super_dry.png",
+            "alc_percent": 5.0,
+        },
+        {
+            "id": 2,
+            "name": "ほろよい もも",
+            "image_url": "https://hoge/moomdayo.jpg",
+            "alc_percent": 3.0,
+        },
+    ]
+
+
+@app.get("/order_menu", response_model=List[OrderMenuModel])
+def get_order_menu_list():
     return [
         {
             "id": 1,
@@ -51,8 +70,8 @@ def get_menu_list():
     ]
 
 
-@app.get("/menu/{menu_id}", response_model=MenuModel)
-def get_menu_by_id(menu_id: int):
+@app.get("/order_menu/{order_menu_id}", response_model=OrderMenuModel)
+def get_order_menu_by_id(order_menu_id: int):
     return {
         "id": 1,
         "name": "マンハッタン",
@@ -85,32 +104,42 @@ def get_menu_by_id(menu_id: int):
     }
 
 
-@app.get("/liquid/stock", response_model=List[LiquidStockModel])
-def get_liquid_stock():
+@app.get("/ingredient/stock", response_model=List[IngredientStockModel])
+def get_ingredient_stock():
     return [
         {
             "id": 1,
             "name": "ウィスキー",
             "alc_percent": 40,
-            "amount_ml": 1000,
+            "unit": "ml",
+            "amount": 1000,
         },
         {
             "id": 2,
             "name": "スイートベルモット",
             "alc_percent": 16,
-            "amount_ml": 1000,
+            "unit": "ml",
+            "amount": 1000,
         },
         {
             "id": 3,
             "name": "アロマティックビダーズ",
             "alc_percent": 0,
-            "amount_ml": 100,
+            "unit": "ml",
+            "amount": 100,
+        },
+        {
+            "id": 4,
+            "name": "レモン",
+            "alc_percent": 0,
+            "unit": "slice",
+            "amount": 24,
         },
     ]
 
 
-@app.post("/order/{menu_id}", response_model=OrderSuccessModel)
-def order(menu_id: int):
+@app.post("/order/{order_menu_id}", response_model=OrderSuccessModel)
+def order(order_menu_id: int):
     return {"order_id": 1}
 
 

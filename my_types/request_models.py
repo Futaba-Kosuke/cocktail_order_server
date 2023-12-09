@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 class IngredientRequestModel(BaseModel):
-    liquid_id: int
-    unit: Literal["ml", "tea_spoon", "dash"]
+    ingredient_id: int
+    unit: Literal["ml", "tea_spoon", "dash", "slice"]
     amount: int
 
 

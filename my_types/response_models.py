@@ -3,14 +3,21 @@ from typing import List, Literal
 from pydantic import BaseModel
 
 
+class SelfMenuModel(BaseModel):
+    id: int
+    name: str
+    image_url: str
+    alc_percent: float
+
+
 class IngredientModel(BaseModel):
     id: int
     name: str
-    unit: Literal["ml", "tea_spoon", "dash"]
+    unit: Literal["ml", "tea_spoon", "dash", "slice"]
     amount: int
 
 
-class MenuModel(BaseModel):
+class OrderMenuModel(BaseModel):
     id: int
     name: str
     description: str
@@ -22,11 +29,12 @@ class MenuModel(BaseModel):
     ingredients: List[IngredientModel]
 
 
-class LiquidStockModel(BaseModel):
+class IngredientStockModel(BaseModel):
     id: int
     name: str
     alc_percent: float
-    amount_ml: int
+    unit: Literal["ml", "tea_spoon", "dash", "slice"]
+    amount: int
 
 
 class OrderSuccessModel(BaseModel):
