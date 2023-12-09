@@ -1,4 +1,6 @@
-# FastAPI Template
+# Cocktail Order Server
+
+2023年の忘年会用のカクテルオーダーアプリのサーバサイド実装です。
 
 ## Installation
 
@@ -39,3 +41,13 @@ poetry shell
 | black | フォーマット調整 |
 | flake8 | PEP8スタイル、論理エラー、複雑度のチェック |
 | mypy | 型チェック |
+
+### 4. デプロイ
+デプロイ用のシェルを実装しています。デプロイ先は Deta Space です。
+```sh
+# 初期設定
+space new
+
+# デプロイ
+sh deploy.sh
+```
