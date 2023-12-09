@@ -1,4 +1,4 @@
-from typing import List, Literal, Union
+from typing import List, Literal
 
 from pydantic import BaseModel
 
@@ -7,7 +7,7 @@ class IngredientModel(BaseModel):
     id: int
     name: str
     unit: Literal["ml", "tea_spoon", "dash"]
-    amount_ml: Union[int, None] = None
+    amount: int
 
 
 class MenuModel(BaseModel):
@@ -20,3 +20,10 @@ class MenuModel(BaseModel):
     specials: List[str] = ["HOT", "SNOW_STYLE"]
     alc_percent: float
     ingredients: List[IngredientModel]
+
+
+class LiquidStockModel(BaseModel):
+    id: int
+    name: str
+    alc_percent: float
+    amount_ml: int

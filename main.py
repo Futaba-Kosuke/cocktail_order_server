@@ -3,7 +3,7 @@ from typing import List
 import uvicorn
 from fastapi import FastAPI
 
-from my_types import MenuModel
+from my_types import LiquidStockModel, MenuModel
 
 app = FastAPI()
 
@@ -25,18 +25,19 @@ def get_menu_list():
                     "id": 1,
                     "name": "ウィスキー",
                     "unit": "ml",
-                    "amount_ml": 45,
+                    "amount": 45,
                 },
                 {
                     "id": 2,
                     "name": "スイートベルモット",
                     "unit": "ml",
-                    "amount_ml": 15,
+                    "amount": 15,
                 },
                 {
                     "id": 3,
                     "name": "アロマティックビダーズ",
                     "unit": "dash",
+                    "amount": 1,
                 },
             ],
         }
@@ -59,21 +60,46 @@ def get_menu_by_id(menu_id):
                 "id": 1,
                 "name": "ウィスキー",
                 "unit": "ml",
-                "amount_ml": 45,
+                "amount": 45,
             },
             {
                 "id": 2,
                 "name": "スイートベルモット",
                 "unit": "ml",
-                "amount_ml": 15,
+                "amount": 15,
             },
             {
                 "id": 3,
                 "name": "アロマティックビダーズ",
                 "unit": "dash",
+                "amount": 1,
             },
         ],
     }
+
+
+@app.get("/liquid/stock", response_model=List[LiquidStockModel])
+def get_liquid_stock():
+    return [
+        {
+            "id": 1,
+            "name": "ウィスキー",
+            "alc_percent": 40,
+            "amount_ml": 1000,
+        },
+        {
+            "id": 2,
+            "name": "スイートベルモット",
+            "alc_percent": 16,
+            "amount_ml": 1000,
+        },
+        {
+            "id": 3,
+            "name": "アロマティックビダーズ",
+            "alc_percent": 0,
+            "amount_ml": 100,
+        },
+    ]
 
 
 def main() -> None:
