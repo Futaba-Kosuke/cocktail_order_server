@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from .commons import UnitType
+from .enum import UnitType
 
 
 class IngredientRequestModel(BaseModel):

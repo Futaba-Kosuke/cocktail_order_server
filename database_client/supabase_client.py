@@ -24,3 +24,47 @@ class SupabaseClient:
             }
             for row in res.data
         ]
+
+    def get_order_menu_list(self):
+        res = (
+            self.supabase.table("order_menu")
+            .select(
+                ", ".join(
+                    [
+                        "id",
+                        "name",
+                        "description",
+                        "image_url",
+                        "method",
+                        "style",
+                        "specials",
+                        "recipe(ingredient(*), unit, amount)",
+                    ]
+                )
+            )
+            .execute()
+        )
+        print(res)
+
+        return [
+            {
+                "id": order_menu["id"],
+                "name": order_menu["name"],
+                "description": order_menu["description"],
+                "image_url": order_menu["image_url"],
+                "method": order_menu["method"],
+                "style": order_menu["style"],
+                "specials": order_menu["specials"],
+                "ingredients": [
+                    {
+                        "id": recipe["ingredient"]["id"],
+                        "name": recipe["ingredient"]["name"],
+                        "unit": recipe["unit"],
+                        "amount": recipe["amount"],
+                        "alc_percent": recipe["ingredient"]["alc_percent"],
+                    }
+                    for recipe in order_menu["recipe"]
+                ],
+            }
+            for order_menu in res.data
+        ]

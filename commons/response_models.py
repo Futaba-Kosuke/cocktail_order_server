@@ -2,7 +2,7 @@ from typing import List, Literal
 
 from pydantic import BaseModel
 
-from .commons import MethodType, OrderStatusType, StyleType, UnitType
+from .enum import MethodType, OrderStatusType, StyleType, UnitType
 
 
 class SelfMenuModel(BaseModel):
