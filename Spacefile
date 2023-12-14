@@ -10,3 +10,4 @@ micros:
       env:
         - name: SUPABASE_URL
         - name: SUPABASE_API_KEY
+        - name: ALLOW_ORIGINS

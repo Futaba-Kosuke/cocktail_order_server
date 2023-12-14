@@ -1,11 +1,13 @@
+import os
 from typing import List
 
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from database_client import SupabaseClient
-from my_types import (
+from commons import (
+    Bitset,
     DefaultSuccessModel,
     IngredientStockModel,
     ManualOrderRequestModel,
@@ -13,13 +15,28 @@ from my_types import (
     OrderMenuModel,
     OrderSuccessModel,
     SelfMenuModel,
+    calc_alc_percent,
+    method_enum,
+    special_elements,
+    style_enum,
+    unit_enum,
 )
+from database_client import SupabaseClient
 
 # load enviroments
 load_dotenv()
 
 # create fastapi instance
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin for origin in os.environ.get("ALLOW_ORIGINS", "").split(",")
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # create supabase client instance
 database_client = SupabaseClient()
@@ -33,38 +50,32 @@ def get_self_menu_list():
 
 @app.get("/order_menu", response_model=List[OrderMenuModel])
 def get_order_menu_list():
-    return [
+    raw_order_menu_list = database_client.get_order_menu_list()
+
+    special_bitset = Bitset(special_elements)
+    res_order_menu_list = [
         {
-            "id": 1,
-            "name": "マンハッタン",
-            "description": "マンハッタン（英: Manhattan）は、ウイスキーベースのカクテルの一種である。カクテルの女王と呼ばれる",
-            "image_url": "https://liqul.com/upimg/2020/06/015-manhattan01.jpg",
-            "method": "stir",
-            "style": "short",
-            "specials": [],
-            "alc_percent": 34.0,
+            "id": menu["id"],
+            "name": menu["name"],
+            "description": menu["description"],
+            "image_url": menu["image_url"],
+            "method": method_enum[menu["method"]],
+            "style": style_enum[menu["style"]],
+            "alc_percent": calc_alc_percent(menu["ingredients"]),
+            "specials": special_bitset.decimal_to_list(menu["specials"]),
             "ingredients": [
                 {
-                    "id": 1,
-                    "name": "ウィスキー",
-                    "unit": "ml",
-                    "amount": 45,
-                },
-                {
-                    "id": 2,
-                    "name": "スイートベルモット",
-                    "unit": "ml",
-                    "amount": 15,
-                },
-                {
-                    "id": 3,
-                    "name": "アロマティックビダーズ",
-                    "unit": "dash",
-                    "amount": 1,
-                },
+                    "id": ingredient["id"],
+                    "name": ingredient["name"],
+                    "unit": unit_enum[ingredient["unit"]],
+                    "amount": ingredient["amount"],
+                }
+                for ingredient in menu["ingredients"]
             ],
         }
+        for menu in raw_order_menu_list
     ]
+    return res_order_menu_list
 
 
 @app.get("/order_menu/{order_menu_id}", response_model=OrderMenuModel)
