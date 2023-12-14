@@ -1,8 +1,10 @@
+import os
 from typing import List
 
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from commons import (
     Bitset,
@@ -26,6 +28,15 @@ load_dotenv()
 
 # create fastapi instance
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin for origin in os.environ.get("ALLOW_ORIGINS", "").split(",")
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # create supabase client instance
 database_client = SupabaseClient()
