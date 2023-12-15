@@ -3,7 +3,7 @@ from typing import List
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from commons import (
@@ -41,6 +41,9 @@ app.add_middleware(
 # create supabase client instance
 database_client = SupabaseClient()
 
+# create special bitset map
+special_bitset = Bitset(special_elements)
+
 
 @app.get("/self_menu", response_model=List[SelfMenuModel])
 def get_self_menu_list():
@@ -51,8 +54,6 @@ def get_self_menu_list():
 @app.get("/order_menu", response_model=List[OrderMenuModel])
 def get_order_menu_list():
     raw_order_menu_list = database_client.get_order_menu_list()
-
-    special_bitset = Bitset(special_elements)
     res_order_menu_list = [
         {
             "id": menu["id"],
@@ -80,36 +81,29 @@ def get_order_menu_list():
 
 @app.get("/order_menu/{order_menu_id}", response_model=OrderMenuModel)
 def get_order_menu_by_id(order_menu_id: int):
-    return {
-        "id": 1,
-        "name": "マンハッタン",
-        "description": "マンハッタン（英: Manhattan）は、ウイスキーベースのカクテルの一種である。カクテルの女王と呼ばれる",
-        "image_url": "https://liqul.com/upimg/2020/06/015-manhattan01.jpg",
-        "method": "stir",
-        "style": "short",
-        "specials": [],
-        "alc_percent": 34.0,
+    raw_order_menu = database_client.get_order_menu(order_menu_id)
+    if raw_order_menu is None:
+        raise HTTPException(status_code=404, detail="Not Found...")
+    res_order_menu = {
+        "id": raw_order_menu["id"],
+        "name": raw_order_menu["name"],
+        "description": raw_order_menu["description"],
+        "image_url": raw_order_menu["image_url"],
+        "method": method_enum[raw_order_menu["method"]],
+        "style": style_enum[raw_order_menu["style"]],
+        "alc_percent": calc_alc_percent(raw_order_menu["ingredients"]),
+        "specials": special_bitset.decimal_to_list(raw_order_menu["specials"]),
         "ingredients": [
             {
-                "id": 1,
-                "name": "ウィスキー",
-                "unit": "ml",
-                "amount": 45,
-            },
-            {
-                "id": 2,
-                "name": "スイートベルモット",
-                "unit": "ml",
-                "amount": 15,
-            },
-            {
-                "id": 3,
-                "name": "アロマティックビダーズ",
-                "unit": "dash",
-                "amount": 1,
-            },
+                "id": ingredient["id"],
+                "name": ingredient["name"],
+                "unit": unit_enum[ingredient["unit"]],
+                "amount": ingredient["amount"],
+            }
+            for ingredient in raw_order_menu["ingredients"]
         ],
     }
+    return res_order_menu
 
 
 @app.get("/ingredient/stock", response_model=List[IngredientStockModel])
