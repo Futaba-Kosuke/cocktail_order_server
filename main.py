@@ -255,7 +255,7 @@ def manual_order(manual_order: ManualOrderRequestModel):
 
 
 @app.get("/order_log/display", response_model=List[OrderLogCallingModel])
-def mock_get_display_order_log():
+def get_display_order_log():
     order_log_list = database_client.get_order_log_by_statuses(
         [
             order_status_enum.index("processing"),
@@ -277,14 +277,20 @@ def mock_get_display_order_log():
 @app.put(
     "/order_log/to_calling/{order_log_id}", response_model=DefaultSuccessModel
 )
-def mock_to_calling(order_log_id: int):
+def to_calling(order_log_id: int):
+    database_client.update_order_log(
+        order_log_id, order_status_enum.index("calling")
+    )
     return {"resp": "success"}
 
 
 @app.put(
     "/order_log/to_complete/{order_log_id}", response_model=DefaultSuccessModel
 )
-def mock_to_complete_order(order_log_id: int):
+def to_complete_order(order_log_id: int):
+    database_client.update_order_log(
+        order_log_id, order_status_enum.index("complete")
+    )
     return {"resp": "success"}
 
 

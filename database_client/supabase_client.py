@@ -202,3 +202,12 @@ class SupabaseClient:
             .execute()
         )
         return res.data
+
+    def update_order_log(self, id: int, status: int):
+        res = (
+            self.supabase.table("order_log")
+            .update({"status": status})
+            .eq("id", id)
+            .execute()
+        )
+        return res.data
