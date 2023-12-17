@@ -256,22 +256,21 @@ def manual_order(manual_order: ManualOrderRequestModel):
 
 @app.get("/order_log/display", response_model=List[OrderLogCallingModel])
 def mock_get_display_order_log():
+    order_log_list = database_client.get_order_log_by_statuses(
+        [
+            order_status_enum.index("processing"),
+            order_status_enum.index("calling"),
+        ]
+    )
     return [
         {
-            "order_id": 1,
-            "menu_name": "マンハッタン",
-            "status": "processing",
-        },
-        {
-            "order_id": 2,
-            "menu_name": "ほげカクテル",
-            "status": "processing",
-        },
-        {
-            "order_id": 3,
-            "menu_name": "ふがカクテル",
-            "status": "calling",
-        },
+            "order_id": order_log["id"],
+            "menu_name": order_log["order_menu"]["name"]
+            if order_log["order_menu"] is not None
+            else "Order Made",
+            "status": order_status_enum[order_log["status"]],
+        }
+        for order_log in order_log_list
     ]
 
 
@@ -283,7 +282,7 @@ def mock_to_calling(order_log_id: int):
 
 
 @app.put(
-    "/order_log/complete/{order_log_id}", response_model=DefaultSuccessModel
+    "/order_log/to_complete/{order_log_id}", response_model=DefaultSuccessModel
 )
 def mock_to_complete_order(order_log_id: int):
     return {"resp": "success"}

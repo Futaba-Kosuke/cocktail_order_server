@@ -193,3 +193,12 @@ class SupabaseClient:
             ingredient_log_list
         ).execute()
         return order_log_id
+
+    def get_order_log_by_statuses(self, target_statuses):
+        res = (
+            self.supabase.table("order_log")
+            .select("id, order_menu(name), status, created_at")
+            .in_("status", target_statuses)
+            .execute()
+        )
+        return res.data
