@@ -1,4 +1,4 @@
-from .enum import unit_enum
+from .enum import UnitType, unit_enum
 
 
 def calc_alc_percent(ingredients) -> float:
@@ -59,3 +59,11 @@ def calc_order_menu_stock_amount(
     ):
         return int(ingredient_stock_amount / (order_menu_amount * 5))
     return int(ingredient_stock_amount / order_menu_amount)
+
+
+def calc_amount(amount: int, unit: UnitType) -> int:
+    if unit == "tea_spoon":
+        return amount * 5
+    if unit == "drop":
+        return 0
+    return amount

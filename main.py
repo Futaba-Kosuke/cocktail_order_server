@@ -16,6 +16,7 @@ from commons import (
     OrderSuccessModel,
     SelfMenuModel,
     calc_alc_percent,
+    calc_amount,
     calc_ingredient_stock_amount,
     calc_order_menu_stock_amount,
     method_enum,
@@ -201,9 +202,56 @@ def order(order_menu_id: int):
     return {"order_id": order_log_id}
 
 
-@app.post("/order/manual", response_model=OrderSuccessModel)
-def mock_manual_order(manual_order: ManualOrderRequestModel):
-    return {"order_id": 1}
+@app.post("/manual_order", response_model=OrderSuccessModel)
+def manual_order(manual_order: ManualOrderRequestModel):
+    # check request payload
+    req_ingredients = {
+        ingredient.ingredient_id: {
+            "unit": ingredient.unit,
+            "amount": ingredient.amount,
+        }
+        for ingredient in manual_order.ingredients
+    }
+    raw_ingredients = database_client.get_ingredients_by_ids(
+        list(req_ingredients.keys())
+    )
+    if raw_ingredients is None:
+        raise HTTPException(status_code=404, detail="Not Found...")
+
+    # check stock
+    min_stock = min(
+        [
+            calc_ingredient_stock_amount(
+                initial_amount=raw_ingredient["amount"],
+                unit=raw_ingredient["unit"],
+                ingredient_logs=raw_ingredient["ingredient_log"],
+            )
+            - calc_amount(
+                amount=req_ingredients[raw_ingredient["id"]]["amount"],  # type: ignore
+                unit=req_ingredients[raw_ingredient["id"]]["unit"],  # type: ignore
+            )
+            for raw_ingredient in raw_ingredients
+        ]
+    )
+    if min_stock <= 0:
+        raise HTTPException(status_code=400, detail="Bad Request...")
+
+    # create logs
+    order_log = {
+        "status": order_status_enum.index("processing"),
+    }
+    ingredient_log_list = [
+        {
+            "ingredient_id": ingredient.ingredient_id,
+            "unit": unit_enum.index(ingredient.unit),
+            "amount": ingredient.amount,
+        }
+        for ingredient in manual_order.ingredients
+    ]
+    order_log_id = database_client.insert_order_log(
+        order_log=order_log, ingredient_log_list=ingredient_log_list
+    )
+    return {"order_id": order_log_id}
 
 
 @app.get("/order_log/display", response_model=List[OrderLogCallingModel])
