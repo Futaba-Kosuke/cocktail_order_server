@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from .enum import unit_enum
 
 
@@ -25,7 +23,9 @@ def calc_alc_percent(ingredients) -> float:
 
 
 def calc_ingredient_stock_amount(
-    initial_amount: int, unit: int, ingredient_logs: List[Dict[str, int]]
+    initial_amount: int,
+    unit: int,
+    ingredient_logs,
 ) -> int:
     if unit_enum[unit] == "ml":
         amount = initial_amount
@@ -45,3 +45,17 @@ def calc_ingredient_stock_amount(
             ]
         )
     return initial_amount
+
+
+def calc_order_menu_stock_amount(
+    ingredient_stock_amount: int,
+    ingredient_unit: int,
+    order_menu_amount: int,
+    order_menu_unit: int,
+) -> int:
+    if (
+        unit_enum[ingredient_unit] == "ml"
+        and unit_enum[order_menu_unit] == "tea_spoon"
+    ):
+        return int(ingredient_stock_amount / (order_menu_amount * 5))
+    return int(ingredient_stock_amount / order_menu_amount)

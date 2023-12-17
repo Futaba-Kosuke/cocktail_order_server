@@ -1,7 +1,40 @@
 import os
 from dataclasses import dataclass, field
+from typing import List, Optional, TypedDict
 
 from supabase import Client, create_client
+
+IngredientLogDbResType = TypedDict(
+    "IngredientLogDbResType", {"unit": int, "amount": int}
+)
+
+IngredientDbResType = TypedDict(
+    "IngredientDbResType",
+    {
+        "id": int,
+        "name": str,
+        "unit": int,
+        "amount": int,
+        "alc_percent": float,
+        "ingredient_unit": int,
+        "ingredient_amount": int,
+        "ingredient_log": List[IngredientLogDbResType],
+    },
+)
+
+OrderMenuDbResType = TypedDict(
+    "OrderMenuDbResType",
+    {
+        "id": int,
+        "name": str,
+        "description": str,
+        "image_url": str,
+        "method": int,
+        "style": int,
+        "specials": int,
+        "ingredients": List[IngredientDbResType],
+    },
+)
 
 
 @dataclass
@@ -25,7 +58,7 @@ class SupabaseClient:
         res = self.supabase.table("self_menu").select("*").execute()
         return [self.__self_menu_row_to_res(row) for row in res.data]
 
-    def __order_menu_row_to_res(self, row):
+    def __order_menu_row_to_res(self, row) -> OrderMenuDbResType:
         return {
             "id": row["id"],
             "name": row["name"],
@@ -41,12 +74,18 @@ class SupabaseClient:
                     "unit": recipe["unit"],
                     "amount": recipe["amount"],
                     "alc_percent": recipe["ingredient"]["alc_percent"],
+                    "ingredient_amount": recipe["ingredient"]["amount"],
+                    "ingredient_unit": recipe["ingredient"]["unit"],
+                    "ingredient_log": [
+                        {"unit": log["unit"], "amount": log["amount"]}
+                        for log in recipe["ingredient"]["ingredient_log"]
+                    ],
                 }
                 for recipe in row["recipe"]
             ],
         }
 
-    def get_order_menu_list(self):
+    def get_order_menu_list(self) -> List[OrderMenuDbResType]:
         res = (
             self.supabase.table("order_menu")
             .select(
@@ -59,7 +98,7 @@ class SupabaseClient:
                         "method",
                         "style",
                         "specials",
-                        "recipe(ingredient(*), unit, amount)",
+                        "recipe(ingredient(*, ingredient_log(unit, amount)), unit, amount)",
                     ]
                 )
             )
@@ -67,7 +106,7 @@ class SupabaseClient:
         )
         return [self.__order_menu_row_to_res(row) for row in res.data]
 
-    def get_order_menu(self, id: int):
+    def get_order_menu(self, id: int) -> Optional[OrderMenuDbResType]:
         res = (
             self.supabase.table("order_menu")
             .select(
@@ -80,7 +119,7 @@ class SupabaseClient:
                         "method",
                         "style",
                         "specials",
-                        "recipe(ingredient(*), unit, amount)",
+                        "recipe(ingredient(*, ingredient_log(unit, amount)), unit, amount)",
                     ]
                 )
             )
@@ -92,7 +131,7 @@ class SupabaseClient:
 
         return self.__order_menu_row_to_res(res.data[0])
 
-    def get_ingredient_stock(self):
+    def get_ingredients(self):
         res = (
             self.supabase.table("ingredient")
             .select(
@@ -100,13 +139,36 @@ class SupabaseClient:
                     [
                         "id",
                         "name",
-                        "alc_percent",
                         "unit",
                         "amount",
+                        "alc_percent",
                         "ingredient_log(unit, amount)",
                     ]
                 )
             )
+            .execute()
+        )
+        if res is None or res.data is None:
+            return []
+
+        return res.data
+
+    def get_ingredients_by_ids(self, ids: List[int]):
+        res = (
+            self.supabase.table("ingredient")
+            .select(
+                ", ".join(
+                    [
+                        "id",
+                        "name",
+                        "unit",
+                        "amount",
+                        "alc_percent",
+                        "ingredient_log(unit, amount)",
+                    ]
+                )
+            )
+            .in_("id", ids)
             .execute()
         )
         if res is None or res.data is None:

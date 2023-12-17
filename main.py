@@ -17,6 +17,7 @@ from commons import (
     SelfMenuModel,
     calc_alc_percent,
     calc_ingredient_stock_amount,
+    calc_order_menu_stock_amount,
     method_enum,
     special_elements,
     style_enum,
@@ -74,6 +75,21 @@ def get_order_menu_list():
                 }
                 for ingredient in menu["ingredients"]
             ],
+            "stock": min(
+                [
+                    calc_order_menu_stock_amount(
+                        ingredient_stock_amount=calc_ingredient_stock_amount(
+                            initial_amount=ingredient["ingredient_amount"],
+                            unit=ingredient["ingredient_unit"],
+                            ingredient_logs=ingredient["ingredient_log"],
+                        ),
+                        ingredient_unit=ingredient["unit"],
+                        order_menu_amount=ingredient["amount"],
+                        order_menu_unit=ingredient["unit"],
+                    )
+                    for ingredient in menu["ingredients"]
+                ]
+            ),
         }
         for menu in raw_order_menu_list
     ]
@@ -103,13 +119,28 @@ def get_order_menu_by_id(order_menu_id: int):
             }
             for ingredient in raw_order_menu["ingredients"]
         ],
+        "stock": min(
+            [
+                calc_order_menu_stock_amount(
+                    ingredient_stock_amount=calc_ingredient_stock_amount(
+                        initial_amount=ingredient["ingredient_amount"],
+                        unit=ingredient["ingredient_unit"],
+                        ingredient_logs=ingredient["ingredient_log"],
+                    ),
+                    ingredient_unit=ingredient["unit"],
+                    order_menu_amount=ingredient["amount"],
+                    order_menu_unit=ingredient["unit"],
+                )
+                for ingredient in raw_order_menu["ingredients"]
+            ]
+        ),
     }
     return res_order_menu
 
 
 @app.get("/ingredient/stock", response_model=List[IngredientStockModel])
 def get_ingredient_stock():
-    raw_ingredient_stock = database_client.get_ingredient_stock()
+    raw_ingredients = database_client.get_ingredients()
     res_ingredient_stock = [
         {
             "id": ingredient["id"],
@@ -122,7 +153,7 @@ def get_ingredient_stock():
                 ingredient_logs=ingredient["ingredient_log"],
             ),
         }
-        for ingredient in raw_ingredient_stock
+        for ingredient in raw_ingredients
     ]
     return res_ingredient_stock
 

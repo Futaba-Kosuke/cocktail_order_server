@@ -29,6 +29,7 @@ class OrderMenuModel(BaseModel):
     specials: List[str] = ["HOT", "SNOW_STYLE"]
     alc_percent: float
     ingredients: List[IngredientModel]
+    stock: int
 
 
 class IngredientStockModel(BaseModel):
