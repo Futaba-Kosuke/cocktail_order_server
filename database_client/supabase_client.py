@@ -91,3 +91,25 @@ class SupabaseClient:
             return None
 
         return self.__order_menu_row_to_res(res.data[0])
+
+    def get_ingredient_stock(self):
+        res = (
+            self.supabase.table("ingredient")
+            .select(
+                ", ".join(
+                    [
+                        "id",
+                        "name",
+                        "alc_percent",
+                        "unit",
+                        "amount",
+                        "ingredient_log(unit, amount)",
+                    ]
+                )
+            )
+            .execute()
+        )
+        if res is None or res.data is None:
+            return []
+
+        return res.data

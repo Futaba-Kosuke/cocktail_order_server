@@ -16,6 +16,7 @@ from commons import (
     OrderSuccessModel,
     SelfMenuModel,
     calc_alc_percent,
+    calc_ingredient_stock_amount,
     method_enum,
     special_elements,
     style_enum,
@@ -108,36 +109,22 @@ def get_order_menu_by_id(order_menu_id: int):
 
 @app.get("/ingredient/stock", response_model=List[IngredientStockModel])
 def get_ingredient_stock():
-    return [
+    raw_ingredient_stock = database_client.get_ingredient_stock()
+    res_ingredient_stock = [
         {
-            "id": 1,
-            "name": "ウィスキー",
-            "alc_percent": 40,
-            "unit": "ml",
-            "amount": 1000,
-        },
-        {
-            "id": 2,
-            "name": "スイートベルモット",
-            "alc_percent": 16,
-            "unit": "ml",
-            "amount": 1000,
-        },
-        {
-            "id": 3,
-            "name": "アロマティックビダーズ",
-            "alc_percent": 0,
-            "unit": "ml",
-            "amount": 100,
-        },
-        {
-            "id": 4,
-            "name": "レモン",
-            "alc_percent": 0,
-            "unit": "slice",
-            "amount": 24,
-        },
+            "id": ingredient["id"],
+            "name": ingredient["name"],
+            "alc_percent": ingredient["alc_percent"],
+            "unit": unit_enum[ingredient["unit"]],
+            "amount": calc_ingredient_stock_amount(
+                initial_amount=ingredient["amount"],
+                unit=ingredient["unit"],
+                ingredient_logs=ingredient["ingredient_log"],
+            ),
+        }
+        for ingredient in raw_ingredient_stock
     ]
+    return res_ingredient_stock
 
 
 @app.post("/order/{order_menu_id}", response_model=OrderSuccessModel)
