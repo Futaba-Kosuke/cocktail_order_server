@@ -175,3 +175,21 @@ class SupabaseClient:
             return []
 
         return res.data
+
+    def insert_order_log(self, order_log, ingredient_log_list):
+        order_log_res = (
+            self.supabase.table("order_log").insert(order_log).execute()
+        )
+        if (
+            order_log_res is None
+            or order_log_res.data is None
+            or len(order_log_res.data) == 0
+        ):
+            return None
+        order_log_id = order_log_res.data[0]["id"]
+        for ingredient_log in ingredient_log_list:
+            ingredient_log["order_log_id"] = order_log_id
+        self.supabase.table("ingredient_log").insert(
+            ingredient_log_list
+        ).execute()
+        return order_log_id

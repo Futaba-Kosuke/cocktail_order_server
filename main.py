@@ -19,6 +19,7 @@ from commons import (
     calc_ingredient_stock_amount,
     calc_order_menu_stock_amount,
     method_enum,
+    order_status_enum,
     special_elements,
     style_enum,
     unit_enum,
@@ -160,16 +161,53 @@ def get_ingredient_stock():
 
 @app.post("/order/{order_menu_id}", response_model=OrderSuccessModel)
 def order(order_menu_id: int):
-    return {"order_id": 1}
+    raw_order_menu = database_client.get_order_menu(order_menu_id)
+    if raw_order_menu is None:
+        raise HTTPException(status_code=404, detail="Not Found...")
+    stock = min(
+        [
+            calc_order_menu_stock_amount(
+                ingredient_stock_amount=calc_ingredient_stock_amount(
+                    initial_amount=ingredient["ingredient_amount"],
+                    unit=ingredient["ingredient_unit"],
+                    ingredient_logs=ingredient["ingredient_log"],
+                ),
+                ingredient_unit=ingredient["unit"],
+                order_menu_amount=ingredient["amount"],
+                order_menu_unit=ingredient["unit"],
+            )
+            for ingredient in raw_order_menu["ingredients"]
+        ]
+    )
+    if stock <= 0:
+        raise HTTPException(status_code=400, detail="Bad Request...")
+
+    # create logs
+    order_log = {
+        "status": order_status_enum.index("processing"),
+        "order_menu_id": order_menu_id,
+    }
+    ingredient_log_list = [
+        {
+            "ingredient_id": ingredient["id"],
+            "unit": ingredient["unit"],
+            "amount": ingredient["amount"],
+        }
+        for ingredient in raw_order_menu["ingredients"]
+    ]
+    order_log_id = database_client.insert_order_log(
+        order_log=order_log, ingredient_log_list=ingredient_log_list
+    )
+    return {"order_id": order_log_id}
 
 
 @app.post("/order/manual", response_model=OrderSuccessModel)
-def manual_order(manual_order: ManualOrderRequestModel):
+def mock_manual_order(manual_order: ManualOrderRequestModel):
     return {"order_id": 1}
 
 
 @app.get("/order_log/display", response_model=List[OrderLogCallingModel])
-def get_display_order_log():
+def mock_get_display_order_log():
     return [
         {
             "order_id": 1,
@@ -190,9 +228,16 @@ def get_display_order_log():
 
 
 @app.put(
+    "/order_log/to_calling/{order_log_id}", response_model=DefaultSuccessModel
+)
+def mock_to_calling(order_log_id: int):
+    return {"resp": "success"}
+
+
+@app.put(
     "/order_log/complete/{order_log_id}", response_model=DefaultSuccessModel
 )
-def complete_order(order_log_id: int):
+def mock_to_complete_order(order_log_id: int):
     return {"resp": "success"}
 
 
