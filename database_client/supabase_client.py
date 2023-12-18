@@ -42,11 +42,11 @@ class SupabaseClient:
     supabase: Client = field(init=False)
 
     def __post_init__(self):
-        url: str = os.environ.get("SUPABASE_URL")
-        key: str = os.environ.get("SUPABASE_API_KEY")
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_API_KEY")
         self.supabase = create_client(url, key)
 
-    def __self_menu_row_to_res(row):
+    def __self_menu_row_to_res(self, row):
         return {
             "id": row["id"],
             "name": row["name"],

@@ -51,7 +51,7 @@ special_bitset = Bitset(special_elements)
 
 @app.get("/self_menu", response_model=List[SelfMenuModel])
 def get_self_menu_list():
-    self_menu: List[SelfMenuModel] = database_client.get_self_menu_list()
+    self_menu = database_client.get_self_menu_list()
     return self_menu
 
 
