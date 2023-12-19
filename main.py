@@ -11,7 +11,7 @@ from commons import (
     DefaultSuccessModel,
     IngredientStockModel,
     ManualOrderRequestModel,
-    OrderLogCallingModel,
+    OrderLogDisplayModel,
     OrderMenuModel,
     OrderSuccessModel,
     SelfMenuModel,
@@ -91,7 +91,8 @@ def get_order_menu_list():
                     )
                     for ingredient in menu["ingredients"]
                 ]
-            ) - 3,  # 在庫切れ防止
+            )
+            - 3,  # 在庫切れ防止
         }
         for menu in raw_order_menu_list
     ]
@@ -254,7 +255,7 @@ def manual_order(manual_order: ManualOrderRequestModel):
     return {"order_id": order_log_id}
 
 
-@app.get("/order_log/display", response_model=List[OrderLogCallingModel])
+@app.get("/order_log/display", response_model=List[OrderLogDisplayModel])
 def get_display_order_log():
     order_log_list = database_client.get_order_log_by_statuses(
         [
@@ -272,6 +273,22 @@ def get_display_order_log():
         }
         for order_log in order_log_list
     ]
+
+
+@app.get(
+    "/order_log/status/{order_log_id}", response_model=OrderLogDisplayModel
+)
+def get_order_log_by_id(order_lod_id: int):
+    order_log = database_client.get_order_log_by_id(order_lod_id)
+    if order_log is None:
+        raise HTTPException(status_code=404, detail="Not Found...")
+    return {
+        "order_id": order_log["id"],
+        "menu_name": order_log["order_menu"]["name"]
+        if order_log["order_menu"] is not None
+        else "Order Made",
+        "status": order_status_enum[order_log["status"]],
+    }
 
 
 @app.put(

@@ -44,7 +44,7 @@ class OrderSuccessModel(BaseModel):
     order_id: str
 
 
-class OrderLogCallingModel(BaseModel):
+class OrderLogDisplayModel(BaseModel):
     order_id: str
     menu_name: str
     status: OrderStatusType

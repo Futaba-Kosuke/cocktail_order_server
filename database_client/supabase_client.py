@@ -203,6 +203,17 @@ class SupabaseClient:
         )
         return res.data
 
+    def get_order_log_by_id(self, id):
+        res = (
+            self.supabase.table("order_log")
+            .select("id, order_menu(name), status, created_at")
+            .eq("id", id)
+            .execute()
+        )
+        if res is None or res.data is None or len(res.data) == 0:
+            return None
+        return res.data[0]
+
     def update_order_log(self, id: int, status: int):
         res = (
             self.supabase.table("order_log")
