@@ -91,7 +91,7 @@ def get_order_menu_list():
                     )
                     for ingredient in menu["ingredients"]
                 ]
-            ),
+            ) - 3,  # 在庫切れ防止
         }
         for menu in raw_order_menu_list
     ]
