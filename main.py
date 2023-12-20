@@ -77,22 +77,25 @@ def get_order_menu_list():
                 }
                 for ingredient in menu["ingredients"]
             ],
-            "stock": min(
-                [
-                    calc_order_menu_stock_amount(
-                        ingredient_stock_amount=calc_ingredient_stock_amount(
-                            initial_amount=ingredient["ingredient_amount"],
-                            unit=ingredient["ingredient_unit"],
-                            ingredient_logs=ingredient["ingredient_log"],
-                        ),
-                        ingredient_unit=ingredient["unit"],
-                        order_menu_amount=ingredient["amount"],
-                        order_menu_unit=ingredient["unit"],
-                    )
-                    for ingredient in menu["ingredients"]
-                ]
-            )
-            - 3,  # 在庫切れ防止
+            "stock": max(
+                min(
+                    [
+                        calc_order_menu_stock_amount(
+                            ingredient_stock_amount=calc_ingredient_stock_amount(
+                                initial_amount=ingredient["ingredient_amount"],
+                                unit=ingredient["ingredient_unit"],
+                                ingredient_logs=ingredient["ingredient_log"],
+                            ),
+                            ingredient_unit=ingredient["unit"],
+                            order_menu_amount=ingredient["amount"],
+                            order_menu_unit=ingredient["unit"],
+                        )
+                        for ingredient in menu["ingredients"]
+                    ]
+                )
+                - 3,
+                0,
+            ),  # 在庫切れ防止
         }
         for menu in raw_order_menu_list
     ]
@@ -121,22 +124,25 @@ def get_order_menu_list_secret():
                 }
                 for ingredient in menu["ingredients"]
             ],
-            "stock": min(
-                [
-                    calc_order_menu_stock_amount(
-                        ingredient_stock_amount=calc_ingredient_stock_amount(
-                            initial_amount=ingredient["ingredient_amount"],
-                            unit=ingredient["ingredient_unit"],
-                            ingredient_logs=ingredient["ingredient_log"],
-                        ),
-                        ingredient_unit=ingredient["unit"],
-                        order_menu_amount=ingredient["amount"],
-                        order_menu_unit=ingredient["unit"],
-                    )
-                    for ingredient in menu["ingredients"]
-                ]
-            )
-            - 3,  # 在庫切れ防止
+            "stock": max(
+                min(
+                    [
+                        calc_order_menu_stock_amount(
+                            ingredient_stock_amount=calc_ingredient_stock_amount(
+                                initial_amount=ingredient["ingredient_amount"],
+                                unit=ingredient["ingredient_unit"],
+                                ingredient_logs=ingredient["ingredient_log"],
+                            ),
+                            ingredient_unit=ingredient["unit"],
+                            order_menu_amount=ingredient["amount"],
+                            order_menu_unit=ingredient["unit"],
+                        )
+                        for ingredient in menu["ingredients"]
+                    ]
+                )
+                - 3,
+                0,
+            ),  # 在庫切れ防止
         }
         for menu in raw_order_menu_list
     ]
@@ -166,22 +172,25 @@ def get_order_menu_by_id(order_menu_id: int):
             }
             for ingredient in raw_order_menu["ingredients"]
         ],
-        "stock": min(
-            [
-                calc_order_menu_stock_amount(
-                    ingredient_stock_amount=calc_ingredient_stock_amount(
-                        initial_amount=ingredient["ingredient_amount"],
-                        unit=ingredient["ingredient_unit"],
-                        ingredient_logs=ingredient["ingredient_log"],
-                    ),
-                    ingredient_unit=ingredient["unit"],
-                    order_menu_amount=ingredient["amount"],
-                    order_menu_unit=ingredient["unit"],
-                )
-                for ingredient in raw_order_menu["ingredients"]
-            ]
-        )
-        - 3,
+        "stock": max(
+            min(
+                [
+                    calc_order_menu_stock_amount(
+                        ingredient_stock_amount=calc_ingredient_stock_amount(
+                            initial_amount=ingredient["ingredient_amount"],
+                            unit=ingredient["ingredient_unit"],
+                            ingredient_logs=ingredient["ingredient_log"],
+                        ),
+                        ingredient_unit=ingredient["unit"],
+                        order_menu_amount=ingredient["amount"],
+                        order_menu_unit=ingredient["unit"],
+                    )
+                    for ingredient in raw_order_menu["ingredients"]
+                ]
+            )
+            - 3,
+            0,
+        ),
     }
     return res_order_menu
 
