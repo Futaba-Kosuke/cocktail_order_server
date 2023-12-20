@@ -136,7 +136,8 @@ def get_order_menu_by_id(order_menu_id: int):
                 )
                 for ingredient in raw_order_menu["ingredients"]
             ]
-        ),
+        )
+        - 3,
     }
     return res_order_menu
 
