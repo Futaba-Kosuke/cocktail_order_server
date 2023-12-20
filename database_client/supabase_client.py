@@ -102,6 +102,29 @@ class SupabaseClient:
                     ]
                 )
             )
+            .eq("secret", False)
+            .execute()
+        )
+        return [self.__order_menu_row_to_res(row) for row in res.data]
+
+    def get_order_menu_list_secret(self) -> List[OrderMenuDbResType]:
+        res = (
+            self.supabase.table("order_menu")
+            .select(
+                ", ".join(
+                    [
+                        "id",
+                        "name",
+                        "description",
+                        "image_url",
+                        "method",
+                        "style",
+                        "specials",
+                        "recipe(ingredient(*, ingredient_log(unit, amount)), unit, amount)",
+                    ]
+                )
+            )
+            .eq("secret", True)
             .execute()
         )
         return [self.__order_menu_row_to_res(row) for row in res.data]

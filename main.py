@@ -99,6 +99,50 @@ def get_order_menu_list():
     return res_order_menu_list
 
 
+@app.get("/secret_menu", response_model=List[OrderMenuModel])
+def get_order_menu_list_secret():
+    raw_order_menu_list = database_client.get_order_menu_list_secret()
+    res_order_menu_list = [
+        {
+            "id": menu["id"],
+            "name": menu["name"],
+            "description": menu["description"],
+            "image_url": menu["image_url"],
+            "method": method_enum[menu["method"]],
+            "style": style_enum[menu["style"]],
+            "alc_percent": calc_alc_percent(menu["ingredients"]),
+            "specials": special_bitset.decimal_to_list(menu["specials"]),
+            "ingredients": [
+                {
+                    "id": ingredient["id"],
+                    "name": ingredient["name"],
+                    "unit": unit_enum[ingredient["unit"]],
+                    "amount": ingredient["amount"],
+                }
+                for ingredient in menu["ingredients"]
+            ],
+            "stock": min(
+                [
+                    calc_order_menu_stock_amount(
+                        ingredient_stock_amount=calc_ingredient_stock_amount(
+                            initial_amount=ingredient["ingredient_amount"],
+                            unit=ingredient["ingredient_unit"],
+                            ingredient_logs=ingredient["ingredient_log"],
+                        ),
+                        ingredient_unit=ingredient["unit"],
+                        order_menu_amount=ingredient["amount"],
+                        order_menu_unit=ingredient["unit"],
+                    )
+                    for ingredient in menu["ingredients"]
+                ]
+            )
+            - 3,  # 在庫切れ防止
+        }
+        for menu in raw_order_menu_list
+    ]
+    return res_order_menu_list
+
+
 @app.get("/order_menu/{order_menu_id}", response_model=OrderMenuModel)
 def get_order_menu_by_id(order_menu_id: int):
     raw_order_menu = database_client.get_order_menu(order_menu_id)
