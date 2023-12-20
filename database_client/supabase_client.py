@@ -103,6 +103,7 @@ class SupabaseClient:
                 )
             )
             .eq("secret", False)
+            .eq("enabled", True)
             .execute()
         )
         return [self.__order_menu_row_to_res(row) for row in res.data]
@@ -125,6 +126,7 @@ class SupabaseClient:
                 )
             )
             .eq("secret", True)
+            .eq("enabled", True)
             .execute()
         )
         return [self.__order_menu_row_to_res(row) for row in res.data]
@@ -147,6 +149,7 @@ class SupabaseClient:
                 )
             )
             .eq("id", id)
+            .eq("enabled", True)
             .execute()
         )
         if res is None or res.data is None or len(res.data) == 0:
