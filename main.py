@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import Final, List
 
 import uvicorn
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ from commons import (
     SelfMenuModel,
     calc_alc_percent,
     calc_amount,
+    calc_any,
     calc_ingredient_stock_amount,
     calc_order_menu_stock_amount,
     method_enum,
@@ -26,6 +27,9 @@ from commons import (
     unit_enum,
 )
 from database_client import SupabaseClient
+
+TOLL_GLASS_ML: Final[int] = 300
+STOCK_MARGIN: Final[int] = 3
 
 # load enviroments
 load_dotenv()
@@ -87,13 +91,21 @@ def get_order_menu_list():
                                 ingredient_logs=ingredient["ingredient_log"],
                             ),
                             ingredient_unit=ingredient["unit"],
-                            order_menu_amount=ingredient["amount"],
-                            order_menu_unit=ingredient["unit"],
+                            order_menu_amount=ingredient["amount"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else calc_any(
+                                ingredient["amount"],
+                                TOLL_GLASS_ML,
+                                menu["ingredients"],
+                            ),
+                            order_menu_unit=ingredient["unit"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else unit_enum.index("ml"),
                         )
                         for ingredient in menu["ingredients"]
                     ]
                 )
-                - 3,
+                - STOCK_MARGIN,
                 0,
             ),  # 在庫切れ防止
         }
@@ -134,13 +146,21 @@ def get_order_menu_list_secret():
                                 ingredient_logs=ingredient["ingredient_log"],
                             ),
                             ingredient_unit=ingredient["unit"],
-                            order_menu_amount=ingredient["amount"],
-                            order_menu_unit=ingredient["unit"],
+                            order_menu_amount=ingredient["amount"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else calc_any(
+                                ingredient["amount"],
+                                TOLL_GLASS_ML,
+                                menu["ingredients"],
+                            ),
+                            order_menu_unit=ingredient["unit"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else unit_enum.index("ml"),
                         )
                         for ingredient in menu["ingredients"]
                     ]
                 )
-                - 3,
+                - STOCK_MARGIN,
                 0,
             ),  # 在庫切れ防止
         }
@@ -182,13 +202,21 @@ def get_order_menu_by_id(order_menu_id: int):
                             ingredient_logs=ingredient["ingredient_log"],
                         ),
                         ingredient_unit=ingredient["unit"],
-                        order_menu_amount=ingredient["amount"],
-                        order_menu_unit=ingredient["unit"],
+                        order_menu_amount=ingredient["amount"]
+                        if unit_enum[ingredient["unit"]] != "any"
+                        else calc_any(
+                            ingredient["amount"],
+                            TOLL_GLASS_ML,
+                            raw_order_menu["ingredients"],
+                        ),
+                        order_menu_unit=ingredient["unit"]
+                        if unit_enum[ingredient["unit"]] != "any"
+                        else unit_enum.index("ml"),
                     )
                     for ingredient in raw_order_menu["ingredients"]
                 ]
             )
-            - 3,
+            - STOCK_MARGIN,
             0,
         ),
     }
@@ -229,8 +257,16 @@ def order(order_menu_id: int):
                     ingredient_logs=ingredient["ingredient_log"],
                 ),
                 ingredient_unit=ingredient["unit"],
-                order_menu_amount=ingredient["amount"],
-                order_menu_unit=ingredient["unit"],
+                order_menu_amount=ingredient["amount"]
+                if unit_enum[ingredient["unit"]] != "any"
+                else calc_any(
+                    ingredient["amount"],
+                    TOLL_GLASS_ML,
+                    raw_order_menu["ingredients"],
+                ),
+                order_menu_unit=ingredient["unit"]
+                if unit_enum[ingredient["unit"]] != "any"
+                else unit_enum.index("ml"),
             )
             for ingredient in raw_order_menu["ingredients"]
         ]
@@ -246,8 +282,16 @@ def order(order_menu_id: int):
     ingredient_log_list = [
         {
             "ingredient_id": ingredient["id"],
-            "unit": ingredient["unit"],
-            "amount": ingredient["amount"],
+            "unit": ingredient["unit"]
+            if unit_enum[ingredient["unit"]] != "any"
+            else unit_enum.index("ml"),
+            "amount": ingredient["amount"]
+            if unit_enum[ingredient["unit"]] != "any"
+            else calc_any(
+                ingredient["amount"],
+                TOLL_GLASS_ML,
+                raw_order_menu["ingredients"],
+            ),
         }
         for ingredient in raw_order_menu["ingredients"]
     ]

@@ -64,6 +64,18 @@ def calc_order_menu_stock_amount(
 def calc_amount(amount: int, unit: UnitType) -> int:
     if unit == "tea_spoon":
         return amount * 5
-    if unit == "drop":
+    if unit == "drop" or unit == "any":
         return 0
     return amount
+
+
+def calc_any(amount: int, glass_ml: int, ingredients) -> int:
+    return glass_ml - sum(
+        [
+            calc_amount(
+                amount=ingredient["amount"], unit=unit_enum[ingredient["unit"]]
+            )
+            for ingredient in ingredients
+            if unit_enum[ingredient["unit"]] != "slice"
+        ]
+    )
