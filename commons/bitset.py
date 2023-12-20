@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-special_elements: List[str] = ["HOT", "SNOW_STYLE"]
+special_elements: List[str] = ["HOT", "SNOW_SALT", "SNOW_SUGAR"]
 
 
 @dataclass
