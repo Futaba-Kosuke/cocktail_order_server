@@ -332,8 +332,8 @@ def get_display_order_log():
 @app.get(
     "/order_log/status/{order_log_id}", response_model=OrderLogDisplayModel
 )
-def get_order_log_by_id(order_lod_id: int):
-    order_log = database_client.get_order_log_by_id(order_lod_id)
+def get_order_log_by_id(order_log_id: int):
+    order_log = database_client.get_order_log_by_id(order_log_id)
     if order_log is None:
         raise HTTPException(status_code=404, detail="Not Found...")
     return {
