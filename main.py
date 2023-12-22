@@ -28,7 +28,7 @@ from commons import (
 )
 from database_client import SupabaseClient
 
-GLASS_ML: Final[Dict[str, int]] = {"short": 60, "long": 300}
+GLASS_ML: Final[Dict[str, int]] = {"short": 60, "long": 250}
 STOCK_MARGIN: Final[int] = 3
 
 # load enviroments
