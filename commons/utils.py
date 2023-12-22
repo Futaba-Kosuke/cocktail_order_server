@@ -1,22 +1,43 @@
 from .enum import UnitType, unit_enum
 
 
-def calc_alc_percent(ingredients) -> float:
+def calc_alc_percent(ingredients, glass_ml: int) -> float:
     if len(ingredients) == 0:
         return 0
 
     numerator = sum(
         [
             ingredient["alc_percent"] * ingredient["amount"]
-            for ingredient in ingredients
             if unit_enum[ingredient["unit"]] == "ml"
+            or unit_enum[ingredient["unit"]] == "dash"
+            else ingredient["alc_percent"] * ingredient["amount"] * 5
+            if unit_enum[ingredient["unit"]] == "tea_spoon"
+            else ingredient["alc_percent"]
+            * calc_any(
+                ingredient["amount"],
+                glass_ml,
+                ingredients,
+            )
+            for ingredient in ingredients
+            if unit_enum[ingredient["unit"]] != "drop"
+            and unit_enum[ingredient["unit"]] != "slice"
         ]
     )
     denominator = sum(
         [
             ingredient["amount"]
-            for ingredient in ingredients
             if unit_enum[ingredient["unit"]] == "ml"
+            or unit_enum[ingredient["unit"]] == "dash"
+            else ingredient["amount"] * 5
+            if unit_enum[ingredient["unit"]] == "tea_spoon"
+            else calc_any(
+                ingredient["amount"],
+                glass_ml,
+                ingredients,
+            )
+            for ingredient in ingredients
+            if unit_enum[ingredient["unit"]] != "drop"
+            and unit_enum[ingredient["unit"]] != "slice"
         ]
     )
     return round(numerator / denominator, 1)

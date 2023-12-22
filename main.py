@@ -1,5 +1,5 @@
 import os
-from typing import Final, List
+from typing import Dict, Final, List
 
 import uvicorn
 from dotenv import load_dotenv
@@ -28,7 +28,7 @@ from commons import (
 )
 from database_client import SupabaseClient
 
-TOLL_GLASS_ML: Final[int] = 300
+GLASS_ML: Final[Dict[str, int]] = {"short": 60, "long": 300}
 STOCK_MARGIN: Final[int] = 3
 
 # load enviroments
@@ -70,7 +70,9 @@ def get_order_menu_list():
             "image_url": menu["image_url"],
             "method": method_enum[menu["method"]],
             "style": style_enum[menu["style"]],
-            "alc_percent": calc_alc_percent(menu["ingredients"]),
+            "alc_percent": calc_alc_percent(
+                menu["ingredients"], GLASS_ML[style_enum[menu["style"]]]
+            ),
             "specials": special_bitset.decimal_to_list(menu["specials"]),
             "ingredients": [
                 {
@@ -95,7 +97,7 @@ def get_order_menu_list():
                             if unit_enum[ingredient["unit"]] != "any"
                             else calc_any(
                                 ingredient["amount"],
-                                TOLL_GLASS_ML,
+                                GLASS_ML[style_enum[menu["style"]]],
                                 menu["ingredients"],
                             ),
                             order_menu_unit=ingredient["unit"]
@@ -125,7 +127,9 @@ def get_order_menu_list_secret():
             "image_url": menu["image_url"],
             "method": method_enum[menu["method"]],
             "style": style_enum[menu["style"]],
-            "alc_percent": calc_alc_percent(menu["ingredients"]),
+            "alc_percent": calc_alc_percent(
+                menu["ingredients"], GLASS_ML[style_enum[menu["style"]]]
+            ),
             "specials": special_bitset.decimal_to_list(menu["specials"]),
             "ingredients": [
                 {
@@ -150,7 +154,7 @@ def get_order_menu_list_secret():
                             if unit_enum[ingredient["unit"]] != "any"
                             else calc_any(
                                 ingredient["amount"],
-                                TOLL_GLASS_ML,
+                                GLASS_ML[style_enum[menu["style"]]],
                                 menu["ingredients"],
                             ),
                             order_menu_unit=ingredient["unit"]
@@ -181,7 +185,10 @@ def get_order_menu_by_id(order_menu_id: int):
         "image_url": raw_order_menu["image_url"],
         "method": method_enum[raw_order_menu["method"]],
         "style": style_enum[raw_order_menu["style"]],
-        "alc_percent": calc_alc_percent(raw_order_menu["ingredients"]),
+        "alc_percent": calc_alc_percent(
+            raw_order_menu["ingredients"],
+            GLASS_ML[style_enum[raw_order_menu["style"]]],
+        ),
         "specials": special_bitset.decimal_to_list(raw_order_menu["specials"]),
         "ingredients": [
             {
@@ -206,7 +213,7 @@ def get_order_menu_by_id(order_menu_id: int):
                         if unit_enum[ingredient["unit"]] != "any"
                         else calc_any(
                             ingredient["amount"],
-                            TOLL_GLASS_ML,
+                            GLASS_ML[style_enum[raw_order_menu["style"]]],
                             raw_order_menu["ingredients"],
                         ),
                         order_menu_unit=ingredient["unit"]
@@ -261,7 +268,7 @@ def order(order_menu_id: int):
                 if unit_enum[ingredient["unit"]] != "any"
                 else calc_any(
                     ingredient["amount"],
-                    TOLL_GLASS_ML,
+                    GLASS_ML[style_enum[raw_order_menu["style"]]],
                     raw_order_menu["ingredients"],
                 ),
                 order_menu_unit=ingredient["unit"]
@@ -289,7 +296,7 @@ def order(order_menu_id: int):
             if unit_enum[ingredient["unit"]] != "any"
             else calc_any(
                 ingredient["amount"],
-                TOLL_GLASS_ML,
+                GLASS_ML[style_enum[raw_order_menu["style"]]],
                 raw_order_menu["ingredients"],
             ),
         }
