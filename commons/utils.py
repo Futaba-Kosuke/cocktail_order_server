@@ -7,16 +7,20 @@ def calc_alc_percent(ingredients, glass_ml: int) -> float:
 
     numerator = sum(
         [
-            ingredient["alc_percent"] * ingredient["amount"]
-            if unit_enum[ingredient["unit"]] == "ml"
-            or unit_enum[ingredient["unit"]] == "dash"
-            else ingredient["alc_percent"] * ingredient["amount"] * 5
-            if unit_enum[ingredient["unit"]] == "tea_spoon"
-            else ingredient["alc_percent"]
-            * calc_any(
-                ingredient["amount"],
-                glass_ml,
-                ingredients,
+            (
+                ingredient["alc_percent"] * ingredient["amount"]
+                if unit_enum[ingredient["unit"]] == "ml"
+                or unit_enum[ingredient["unit"]] == "dash"
+                else (
+                    ingredient["alc_percent"] * ingredient["amount"] * 5
+                    if unit_enum[ingredient["unit"]] == "tea_spoon"
+                    else ingredient["alc_percent"]
+                    * calc_any(
+                        ingredient["amount"],
+                        glass_ml,
+                        ingredients,
+                    )
+                )
             )
             for ingredient in ingredients
             if unit_enum[ingredient["unit"]] != "drop"
@@ -25,15 +29,19 @@ def calc_alc_percent(ingredients, glass_ml: int) -> float:
     )
     denominator = sum(
         [
-            ingredient["amount"]
-            if unit_enum[ingredient["unit"]] == "ml"
-            or unit_enum[ingredient["unit"]] == "dash"
-            else ingredient["amount"] * 5
-            if unit_enum[ingredient["unit"]] == "tea_spoon"
-            else calc_any(
-                ingredient["amount"],
-                glass_ml,
-                ingredients,
+            (
+                ingredient["amount"]
+                if unit_enum[ingredient["unit"]] == "ml"
+                or unit_enum[ingredient["unit"]] == "dash"
+                else (
+                    ingredient["amount"] * 5
+                    if unit_enum[ingredient["unit"]] == "tea_spoon"
+                    else calc_any(
+                        ingredient["amount"],
+                        glass_ml,
+                        ingredients,
+                    )
+                )
             )
             for ingredient in ingredients
             if unit_enum[ingredient["unit"]] != "drop"

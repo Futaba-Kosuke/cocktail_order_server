@@ -93,16 +93,20 @@ def get_order_menu_list():
                                 ingredient_logs=ingredient["ingredient_log"],
                             ),
                             ingredient_unit=ingredient["unit"],
-                            order_menu_amount=ingredient["amount"]
-                            if unit_enum[ingredient["unit"]] != "any"
-                            else calc_any(
-                                ingredient["amount"],
-                                GLASS_ML[style_enum[menu["style"]]],
-                                menu["ingredients"],
+                            order_menu_amount=(
+                                ingredient["amount"]
+                                if unit_enum[ingredient["unit"]] != "any"
+                                else calc_any(
+                                    ingredient["amount"],
+                                    GLASS_ML[style_enum[menu["style"]]],
+                                    menu["ingredients"],
+                                )
                             ),
-                            order_menu_unit=ingredient["unit"]
-                            if unit_enum[ingredient["unit"]] != "any"
-                            else unit_enum.index("ml"),
+                            order_menu_unit=(
+                                ingredient["unit"]
+                                if unit_enum[ingredient["unit"]] != "any"
+                                else unit_enum.index("ml")
+                            ),
                         )
                         for ingredient in menu["ingredients"]
                     ]
@@ -152,16 +156,20 @@ def get_order_menu_list_secret():
                                 ingredient_logs=ingredient["ingredient_log"],
                             ),
                             ingredient_unit=ingredient["unit"],
-                            order_menu_amount=ingredient["amount"]
-                            if unit_enum[ingredient["unit"]] != "any"
-                            else calc_any(
-                                ingredient["amount"],
-                                GLASS_ML[style_enum[menu["style"]]],
-                                menu["ingredients"],
+                            order_menu_amount=(
+                                ingredient["amount"]
+                                if unit_enum[ingredient["unit"]] != "any"
+                                else calc_any(
+                                    ingredient["amount"],
+                                    GLASS_ML[style_enum[menu["style"]]],
+                                    menu["ingredients"],
+                                )
                             ),
-                            order_menu_unit=ingredient["unit"]
-                            if unit_enum[ingredient["unit"]] != "any"
-                            else unit_enum.index("ml"),
+                            order_menu_unit=(
+                                ingredient["unit"]
+                                if unit_enum[ingredient["unit"]] != "any"
+                                else unit_enum.index("ml")
+                            ),
                         )
                         for ingredient in menu["ingredients"]
                     ]
@@ -211,16 +219,20 @@ def get_order_menu_by_id(order_menu_id: int):
                             ingredient_logs=ingredient["ingredient_log"],
                         ),
                         ingredient_unit=ingredient["unit"],
-                        order_menu_amount=ingredient["amount"]
-                        if unit_enum[ingredient["unit"]] != "any"
-                        else calc_any(
-                            ingredient["amount"],
-                            GLASS_ML[style_enum[raw_order_menu["style"]]],
-                            raw_order_menu["ingredients"],
+                        order_menu_amount=(
+                            ingredient["amount"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else calc_any(
+                                ingredient["amount"],
+                                GLASS_ML[style_enum[raw_order_menu["style"]]],
+                                raw_order_menu["ingredients"],
+                            )
                         ),
-                        order_menu_unit=ingredient["unit"]
-                        if unit_enum[ingredient["unit"]] != "any"
-                        else unit_enum.index("ml"),
+                        order_menu_unit=(
+                            ingredient["unit"]
+                            if unit_enum[ingredient["unit"]] != "any"
+                            else unit_enum.index("ml")
+                        ),
                     )
                     for ingredient in raw_order_menu["ingredients"]
                 ]
@@ -266,16 +278,20 @@ def order(order_menu_id: int):
                     ingredient_logs=ingredient["ingredient_log"],
                 ),
                 ingredient_unit=ingredient["unit"],
-                order_menu_amount=ingredient["amount"]
-                if unit_enum[ingredient["unit"]] != "any"
-                else calc_any(
-                    ingredient["amount"],
-                    GLASS_ML[style_enum[raw_order_menu["style"]]],
-                    raw_order_menu["ingredients"],
+                order_menu_amount=(
+                    ingredient["amount"]
+                    if unit_enum[ingredient["unit"]] != "any"
+                    else calc_any(
+                        ingredient["amount"],
+                        GLASS_ML[style_enum[raw_order_menu["style"]]],
+                        raw_order_menu["ingredients"],
+                    )
                 ),
-                order_menu_unit=ingredient["unit"]
-                if unit_enum[ingredient["unit"]] != "any"
-                else unit_enum.index("ml"),
+                order_menu_unit=(
+                    ingredient["unit"]
+                    if unit_enum[ingredient["unit"]] != "any"
+                    else unit_enum.index("ml")
+                ),
             )
             for ingredient in raw_order_menu["ingredients"]
         ]
@@ -291,15 +307,19 @@ def order(order_menu_id: int):
     ingredient_log_list = [
         {
             "ingredient_id": ingredient["id"],
-            "unit": ingredient["unit"]
-            if unit_enum[ingredient["unit"]] != "any"
-            else unit_enum.index("ml"),
-            "amount": ingredient["amount"]
-            if unit_enum[ingredient["unit"]] != "any"
-            else calc_any(
-                ingredient["amount"],
-                GLASS_ML[style_enum[raw_order_menu["style"]]],
-                raw_order_menu["ingredients"],
+            "unit": (
+                ingredient["unit"]
+                if unit_enum[ingredient["unit"]] != "any"
+                else unit_enum.index("ml")
+            ),
+            "amount": (
+                ingredient["amount"]
+                if unit_enum[ingredient["unit"]] != "any"
+                else calc_any(
+                    ingredient["amount"],
+                    GLASS_ML[style_enum[raw_order_menu["style"]]],
+                    raw_order_menu["ingredients"],
+                )
             ),
         }
         for ingredient in raw_order_menu["ingredients"]
@@ -373,9 +393,11 @@ def get_display_order_log():
     return [
         {
             "order_id": order_log["id"],
-            "menu_name": order_log["order_menu"]["name"]
-            if order_log["order_menu"] is not None
-            else "Order Made",
+            "menu_name": (
+                order_log["order_menu"]["name"]
+                if order_log["order_menu"] is not None
+                else "Order Made"
+            ),
             "status": order_status_enum[order_log["status"]],
         }
         for order_log in order_log_list
@@ -391,9 +413,11 @@ def get_order_log_by_id(order_log_id: int):
         raise HTTPException(status_code=404, detail="Not Found...")
     return {
         "order_id": order_log["id"],
-        "menu_name": order_log["order_menu"]["name"]
-        if order_log["order_menu"] is not None
-        else "Order Made",
+        "menu_name": (
+            order_log["order_menu"]["name"]
+            if order_log["order_menu"] is not None
+            else "Order Made"
+        ),
         "status": order_status_enum[order_log["status"]],
     }
 
