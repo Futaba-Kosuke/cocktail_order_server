@@ -66,8 +66,8 @@ def get_order_menu_list():
         {
             "id": menu["id"],
             "name": menu["name"],
-            "description": menu["description"],
-            "image_url": menu["image_url"],
+            "description": menu["description"] or "",
+            "image_url": menu["image_url"] or "",
             "method": method_enum[menu["method"]],
             "style": style_enum[menu["style"]],
             "alc_percent": calc_alc_percent(
@@ -113,6 +113,8 @@ def get_order_menu_list():
         }
         for menu in raw_order_menu_list
     ]
+    print("AAAAAAA")
+    print("AAAAAAAAA", res_order_menu_list)
     return res_order_menu_list
 
 
